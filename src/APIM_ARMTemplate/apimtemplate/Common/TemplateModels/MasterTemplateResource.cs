@@ -17,6 +17,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Common
     public class MasterTemplateLink
     {
         public string uri { get; set; }
+        public string relativePath { get; set; }
         public string contentVersion { get; set; }
     }
 }

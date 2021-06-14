@@ -142,6 +142,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                             {
                                 productPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{productPolicyFileName}')]";
                             }
+
+
                         }
 
                         templateResources.Add(productPolicyResource);

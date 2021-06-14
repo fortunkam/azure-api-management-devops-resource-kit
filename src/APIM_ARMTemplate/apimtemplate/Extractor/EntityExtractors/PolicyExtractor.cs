@@ -25,7 +25,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             return await CallApiManagementAsync(azToken, requestUrl);
         }
 
-        public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(string apimname, string resourceGroup, string policyXMLBaseUrl, string policyXMLSasToken, string fileFolder)
+        public async Task<Template> GenerateGlobalServicePolicyTemplateAsync(string apimname, string resourceGroup, string policyXMLBaseUrl, string policyXMLSasToken, string fileFolder, Extractor exc)
         {
             // extract global service policy in both full and single api extraction cases
             Console.WriteLine("------------------------------------------");
@@ -54,14 +54,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     this.fileWriter.CreateFolderIfNotExists(policyFolder);
                     this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, globalServicePolicyFileName));
                     globalServicePolicyResource.properties.format = "rawxml-link";
-                    if (policyXMLSasToken != null)
-                    {
-                        globalServicePolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{globalServicePolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
-                    }
-                    else
-                    {
-                        globalServicePolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{globalServicePolicyFileName}')]";
-                    }
+                    globalServicePolicyResource.properties.value = exc.templateLinkingStrategy.GeneratePolicyUri(exc, globalServicePolicyFileName);
                 }
 
                 templateResources.Add(globalServicePolicyResource);

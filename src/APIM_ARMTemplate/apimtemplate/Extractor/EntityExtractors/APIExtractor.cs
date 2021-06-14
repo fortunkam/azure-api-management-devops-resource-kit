@@ -618,14 +618,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                         this.fileWriter.CreateFolderIfNotExists(policyFolder);
                         this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, operationPolicyFileName));
                         operationPolicyResource.properties.format = "rawxml-link";
-                        if (policyXMLSasToken != null)
-                        {
-                            operationPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{operationPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
-                        }
-                        else
-                        {
-                            operationPolicyResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{operationPolicyFileName}')]";
-                        }
+                        operationPolicyResource.properties.value = exc.templateLinkingStrategy.GeneratePolicyUri(exc, operationPolicyFileName);
                     }
 
                     templateResources.Add(operationPolicyResource);
@@ -679,14 +672,8 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
                     this.fileWriter.CreateFolderIfNotExists(policyFolder);
                     this.fileWriter.WriteXMLToFile(policyXMLContent, String.Concat(policyFolder, apiPolicyFileName));
                     apiPoliciesResource.properties.format = "rawxml-link";
-                    if (policyXMLSasToken != null)
-                    {
-                        apiPoliciesResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{apiPolicyFileName}', parameters('{ParameterNames.PolicyXMLSasToken}'))]";
-                    }
-                    else
-                    {
-                        apiPoliciesResource.properties.value = $"[concat(parameters('{ParameterNames.PolicyXMLBaseUrl}'), '{apiPolicyFileName}')]";
-                    }
+                    apiPoliciesResource.properties.value = exc.templateLinkingStrategy.GeneratePolicyUri(exc, apiPolicyFileName);
+
                 }
                 templateResources.Add(apiPoliciesResource);
             }

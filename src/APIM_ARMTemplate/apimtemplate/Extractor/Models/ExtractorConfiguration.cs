@@ -52,6 +52,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         [Description("Parameterize named values where value is retrieved from a Key Vault secret")]
         public bool paramNamedValuesKeyVaultSecrets { get; set; }
 
+        [Description("Choose how the templates are linked (StorageSASPolicy or TemplateSpec)")]
+        public string templateLinkingMethod { get; set; }
+
         [Description("Group the operations into batches of x?")]
         public int operationBatchSize {get;set;}
         public void Validate()
@@ -115,7 +118,9 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
         public bool notIncludeNamedValue { get; private set; }
         public bool paramNamedValuesKeyVaultSecrets { get; private set; }
 
-        public int operationBatchSize { get; private set;} 
+        public int operationBatchSize { get; private set; }
+
+        public ITemplateLinkingStrategy templateLinkingStrategy {get; private set; }
 
         public Extractor(ExtractorConfig exc, string dirName)
         {
@@ -138,6 +143,18 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.notIncludeNamedValue = exc.notIncludeNamedValue != null && exc.notIncludeNamedValue.Equals("true");
             this.operationBatchSize  = exc.operationBatchSize;
             this.paramNamedValuesKeyVaultSecrets = exc.paramNamedValuesKeyVaultSecrets;
+            TemplateLinkingMethod templateLinkingParseResult;
+            templateLinkingParseResult = Enum.TryParse(exc.templateLinkingMethod, out templateLinkingParseResult) == false ? TemplateLinkingMethod.StorageSASPolicy : templateLinkingParseResult;
+
+            switch(templateLinkingParseResult)
+            {
+                case TemplateLinkingMethod.TemplateSpec:
+                    this.templateLinkingStrategy = new TemplateSpecTemplateLinkingStrategy();
+                    break;
+                default:
+                    this.templateLinkingStrategy = new StorageSASPolicyTemplateLinkingStrategy();
+                    break;
+            }
         }
 
         public Extractor(ExtractorConfig exc) : this(exc, exc.fileFolder)
@@ -154,5 +171,16 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             this.apiName = apiName;
             this.serviceUrl = serviceUrl;
         }
+    }
+
+    /// <summary>
+    /// Options for how the templates should be linked together,
+    /// default will be StorageSASPolicy (storage account with optional SAS tokens)
+    /// Template Specs will require a TemplateSpec resource to be deployed.
+    /// </summary>
+    public enum TemplateLinkingMethod
+    {
+        StorageSASPolicy,
+        TemplateSpec
     }
 }

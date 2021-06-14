@@ -89,7 +89,7 @@ namespace Microsoft.Azure.Management.ApiManagement.ArmTemplates.Extract
             }
 
             // extract templates from apim service
-            Template globalServicePolicyTemplate = await policyExtractor.GenerateGlobalServicePolicyTemplateAsync(sourceApim, resourceGroup, policyXMLBaseUrl, policyXMLSasToken, dirName);
+            Template globalServicePolicyTemplate = await policyExtractor.GenerateGlobalServicePolicyTemplateAsync(sourceApim, resourceGroup, policyXMLBaseUrl, policyXMLSasToken, dirName,exc);
             if (apiTemplate == null)
             {
                 apiTemplate = await apiExtractor.GenerateAPIsARMTemplateAsync(singleApiName, multipleApiNames, exc);
